@@ -1,26 +1,10 @@
-import {createElement} from '../utils.js';
+import AbstractView from './abstract.js';
 
 const createPointsListTemplate = () => '<ul class="trip-events__list"></ul>';
 
-class PointList {
-  constructor() {
-    this._element = null;
-  }
-
+class PointList extends AbstractView {
   getTemplate() {
     return createPointsListTemplate();
-  }
-
-  getElement() {
-    if (!this._element) {
-      this._element = createElement(this.getTemplate());
-    }
-
-    return this._element;
-  }
-
-  removeElement() {
-    this._element = null;
   }
 }
 
