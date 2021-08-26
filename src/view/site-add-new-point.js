@@ -1,4 +1,20 @@
-const createNewPointTemplate = (point) => {
+import {createElement} from '../utils.js';
+import {POINT_TYPES, CITIES, PLUG_IMG_URL} from '../mock/point.js';
+
+const BLANK_POINT = {
+  type: POINT_TYPES[0],
+  destination: {
+    description: '',
+    name: CITIES[0],
+    pictures: [
+      {
+        src: `${PLUG_IMG_URL}0`,
+      },
+    ],
+  },
+};
+
+const createPointEditTemplate = (point) => {
   const {type, destination} = point;
 
   return `<li class="trip-events__item">
@@ -167,4 +183,27 @@ const createNewPointTemplate = (point) => {
   </li>`;
 };
 
-export {createNewPointTemplate};
+class PointEdit {
+  constructor(point = BLANK_POINT) {
+    this._point = point;
+    this._element = null;
+  }
+
+  getTemplate() {
+    return createPointEditTemplate(this._point);
+  }
+
+  getElement() {
+    if (!this._element) {
+      this._element = createElement(this.getTemplate());
+    }
+
+    return this._element;
+  }
+
+  removeElement() {
+    this._element = null;
+  }
+}
+
+export default PointEdit;

@@ -1,19 +1,18 @@
 import {createElement} from '../utils.js';
 
-const createSiteMenuTemplate = () => (
-  `<nav class="trip-controls__trip-tabs  trip-tabs">
-    <a class="trip-tabs__btn  trip-tabs__btn--active" href="#">Table</a>
-    <a class="trip-tabs__btn" href="#">Stats</a>
-  </nav>`
+const createNoPointTemplate = () => (
+  `<p class="board__no-tasks" style="text-align: center">
+    Click «New Event» in menu to create your first point
+  </p>`
 );
 
-class SiteMenu {
+class NoPoint {
   constructor() {
     this._element = null;
   }
 
   getTemplate() {
-    return createSiteMenuTemplate();
+    return createNoPointTemplate();
   }
 
   getElement() {
@@ -29,4 +28,4 @@ class SiteMenu {
   }
 }
 
-export default SiteMenu;
+export default NoPoint;
