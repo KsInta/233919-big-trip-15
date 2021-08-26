@@ -1,4 +1,5 @@
-import {isExpired, humanizePointDueDate} from '../utils.js';
+import {getRandomInteger, getRandomArrayElement, getRandomArray} from '../utils/common.js';
+import {isExpired, humanizePointDueDate} from '../utils/point.js';
 import dayjs from 'dayjs';
 
 const POINT_TYPES = ['taxi', 'bus', 'train', 'ship', 'drive', 'flight', 'check-in', 'sightseeing', 'restaurant'];
@@ -35,19 +36,6 @@ const MIN_POINT_PRICE = 100;
 const MAX_POINT_PRICE = 10000;
 const MIN_POINT_TIME_MINUTES_LENGTH = 5;
 const MAX_POINT_TIME_MINUTES_LENGTH = 60;
-
-const getRandomInteger = (min = 0, max = 1) => (min > max) ? (Math.floor(Math.random() * (min + 1 - max)) + max) : (Math.floor(Math.random() * (max + 1 - min)) + min);
-
-const getRandomArrayElement = (array) => array[getRandomInteger(0, array.length - 1)];
-
-const getRandomArray = (parentArray, length) => {
-  const arrayCopy = parentArray.slice();
-  const newArrayLength = getRandomInteger(0, length + 1);
-  const indexStart = getRandomInteger(0, arrayCopy.length - 1);
-  const indexEnd = indexStart + newArrayLength;
-  const description = arrayCopy.slice(indexStart, indexEnd);
-  return description;
-};
 
 const generateDate = () => {
 

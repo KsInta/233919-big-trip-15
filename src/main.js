@@ -8,7 +8,7 @@ import PointView from './view/site-point.js';
 import NoPointView from './view/no-point.js';
 import {generatePoint} from './mock/point.js';
 import {generateFilter} from './filter.js';
-import {render, RenderPosition} from './utils.js';
+import {render, RenderPosition, replace} from './utils/render.js';
 import flatpickr from 'flatpickr';
 
 const POINT_COUNT = 25;
@@ -29,11 +29,11 @@ const renderPoint = (pointListElement, task) => {
   const pointEditComponent = new PointEditView(task);
 
   const replaceCardToForm = () => {
-    pointListElement.replaceChild(pointEditComponent.getElement(), pointComponent.getElement());
+    replace(pointEditComponent, pointComponent);
   };
 
   const replaceFormToCard = () => {
-    pointListElement.replaceChild(pointComponent.getElement(), pointEditComponent.getElement());
+    replace(pointComponent, pointEditComponent);
   };
 
   const onEscKeyDown = (evt) => {
@@ -44,13 +44,12 @@ const renderPoint = (pointListElement, task) => {
     }
   };
 
-  pointComponent.getElement().querySelector('.event__rollup-btn').addEventListener('click', () => {
+  pointComponent.setEditClickHandler(() => {
     replaceCardToForm();
     document.addEventListener('keydown', onEscKeyDown);
   });
 
-  pointEditComponent.getElement().querySelector('form').addEventListener('submit', (evt) => {
-    evt.preventDefault();
+  pointEditComponent.setFormSubmitHandler(() => {
     replaceFormToCard();
     document.removeEventListener('keydown', onEscKeyDown);
   });
@@ -60,7 +59,7 @@ const renderPoint = (pointListElement, task) => {
     replaceFormToCard();
   });
 
-  render(pointListElement, pointComponent.getElement(), RenderPosition.BEFOREEND);
+  render(pointListElement, pointComponent, RenderPosition.BEFOREEND);
 };
 
 const renderBoard = (boardContainer, boardPoints) => {
@@ -68,19 +67,19 @@ const renderBoard = (boardContainer, boardPoints) => {
   render(boardContainer, pointListComponent.getElement(), RenderPosition.BEFOREEND);
 
   for (let i = 0; i < POINT_COUNT; i++) {
-    renderPoint(pointListComponent.getElement(), boardPoints[i]);
+    renderPoint(pointListComponent, boardPoints[i]);
   }
 
   if (points.length === 0) {
-    render(boardContainer, new NoPointView().getElement(), RenderPosition.BEFOREEND);
+    render(boardContainer, new NoPointView(), RenderPosition.BEFOREEND);
   }
 
-  render(boardContainer, new SortView().getElement(), RenderPosition.AFTERBEGIN);
+  render(boardContainer, new SortView(), RenderPosition.AFTERBEGIN);
 };
 
-render(siteNavigationElement, new SiteMenuView().getElement(), RenderPosition.BEFOREEND);
-render(siteFilterElement, new FilterView(filters).getElement(), RenderPosition.BEFOREEND);
-render(siteMainTripElement, new MainTripView().getElement(), RenderPosition.AFTERBEGIN);
+render(siteNavigationElement, new SiteMenuView(), RenderPosition.BEFOREEND);
+render(siteFilterElement, new FilterView(filters), RenderPosition.BEFOREEND);
+render(siteMainTripElement, new MainTripView(), RenderPosition.AFTERBEGIN);
 
 renderBoard(siteBodyContainerElement, points);
 
