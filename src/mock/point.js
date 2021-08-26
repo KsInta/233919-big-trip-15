@@ -91,4 +91,4 @@ const generatePoint = () => {
   };
 };
 
-export {generatePoint};
+export {generatePoint, POINT_TYPES, CITIES, PLUG_IMG_URL};

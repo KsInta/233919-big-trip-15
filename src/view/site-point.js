@@ -1,21 +1,27 @@
+import {createElement} from '../utils.js';
+
+const createPointOfferTemplate = (offer) => {
+  const {title, price} = offer;
+
+  return `<li class="event__offer">
+    <span class="event__offer-title">${title}</span>
+    &plus;&euro;&nbsp;
+    <span class="event__offer-price">${price}</span>
+  </li>`;
+};
+
+const createPointOffersTemplate = (offerItems) => {
+  const pointOffersTemplate = offerItems.map((offer) => createPointOfferTemplate(offer)).join('');
+
+  return `<ul class="event__selected-offers">${pointOffersTemplate}</ul>`;
+};
+
 const createPointTemplate = (point) => {
   const {basePrice, dateFrom, dateTo, type, isFavorite, destination, offers} = point;
 
   const favoriteClassName = isFavorite
     ? 'event__favorite-btn--active'
     : '';
-
-  let ul = '<ul class="event__selected-offers">';
-
-  for (let i = 0; i < offers.length; i++) {
-    ul += `<li class="event__offer">
-      <span class="event__offer-title">${offers[i].title}</span>
-      &plus;&euro;&nbsp;
-      <span class="event__offer-price">${offers[i].price}</span>
-    </li>`;
-  }
-
-  ul += '</ul>';
 
   return `<li class="trip-events__item">
     <div class="event">
@@ -36,7 +42,7 @@ const createPointTemplate = (point) => {
         &euro;&nbsp;<span class="event__price-value">${basePrice}</span>
       </p>
       <h4 class="visually-hidden">Offers:</h4>
-      ${ul}
+      ${createPointOffersTemplate(offers)}
       <button class="event__favorite-btn ${favoriteClassName}" type="button">
         <span class="visually-hidden">Add to favorite</span>
         <svg class="event__favorite-icon" width="28" height="28" viewBox="0 0 28 28">
@@ -50,4 +56,28 @@ const createPointTemplate = (point) => {
   </li>`;
 };
 
-export {createPointTemplate};
+class Point {
+  constructor(task) {
+    this._task = task;
+
+    this._element = null;
+  }
+
+  getTemplate() {
+    return createPointTemplate(this._task);
+  }
+
+  getElement() {
+    if (!this._element) {
+      this._element = createElement(this.getTemplate());
+    }
+
+    return this._element;
+  }
+
+  removeElement() {
+    this._element = null;
+  }
+}
+
+export default Point;
