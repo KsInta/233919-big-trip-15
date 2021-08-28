@@ -1,5 +1,6 @@
 import {getRandomInteger, getRandomArrayElement, getRandomArray} from '../utils/common.js';
 import {isExpired, humanizePointDueDate} from '../utils/point.js';
+import {nanoid} from 'nanoid';
 import dayjs from 'dayjs';
 
 const POINT_TYPES = ['taxi', 'bus', 'train', 'ship', 'drive', 'flight', 'check-in', 'sightseeing', 'restaurant'];
@@ -52,6 +53,7 @@ const generatePoint = () => {
   const pointEndTime = dayjs(pointStartTime).add(pointTimeLength, 'minute');
 
   return {
+    id: nanoid(),
     isExpired: isExpired(pointStartTime),
     basePrice: getRandomInteger(MIN_POINT_PRICE, MAX_POINT_PRICE),
     dateFrom: {
