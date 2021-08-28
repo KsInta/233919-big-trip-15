@@ -10,7 +10,6 @@ import flatpickr from 'flatpickr';
 const POINT_COUNT = 25;
 
 const points = new Array(POINT_COUNT).fill().map(generatePoint);
-console.log(points);
 const filters = generateFilter(points);
 
 const siteMainElement = document.querySelector('.page-body');

@@ -3,12 +3,15 @@ import SortView from '../view/site-sorting.js';
 import NoPointView from '../view/no-point.js';
 import PointPresenter from './point.js';
 import {updateItem} from '../utils/common.js';
+import {sortPointDuration, sortPointPrice} from '../utils/point.js';
 import {render, RenderPosition} from '../utils/render.js';
+import {SortType} from '../const.js';
 
 class Board {
   constructor(boardContainer) {
     this._boardContainer = boardContainer;
     this._pointPresenter = new Map();
+    this._currentSortType = SortType.DEFAULT;
 
     this._sortComponent = new SortView();
     this._pointListComponent = new PointListView();
@@ -16,10 +19,12 @@ class Board {
 
     this._handlePointChange = this._handlePointChange.bind(this);
     this._handleModeChange = this._handleModeChange.bind(this);
+    this._handleSortTypeChange = this._handleSortTypeChange.bind(this);
   }
 
   init(boardPoints) {
     this._boardPoints = boardPoints.slice();
+    this._sourcedBoardPoints = boardPoints.slice();
 
     render(this._boardContainer, this._pointListComponent, RenderPosition.BEFOREEND);
 
@@ -32,11 +37,37 @@ class Board {
 
   _handlePointChange(updatedPoint) {
     this._boardPoints = updateItem(this._boardPoints, updatedPoint);
+    this._sourcedBoardPoints = updateItem(this._sourcedBoardPoints, updatedPoint);
     this._pointPresenter.get(updatedPoint.id).init(updatedPoint);
+  }
+
+  _sortPoints(sortType) {
+    switch (sortType) {
+      case SortType.TIME:
+        this._boardPoints.sort(sortPointDuration);
+        break;
+      case SortType.PRICE:
+        this._boardPoints.sort(sortPointPrice);
+        break;
+      default:
+        this._boardPoints = this._sourcedBoardPoints.slice();
+    }
+
+    this._currentSortType = sortType;
+  }
+
+  _handleSortTypeChange(sortType) {
+    if (this._currentSortType === sortType) {
+      return;
+    }
+    this._sortPoints(sortType);
+    this._clearPointList();
+    this._renderPoints();
   }
 
   _renderSort() {
     render(this._boardContainer, this._sortComponent, RenderPosition.AFTERBEGIN);
+    this._sortComponent.setSortTypeChangeHandler(this._handleSortTypeChange);
   }
 
   _renderPoint(point) {
@@ -53,7 +84,7 @@ class Board {
     render(this._boardContainer, this._noPointComponent, RenderPosition.AFTERBEGIN);
   }
 
-  _clearTaskList() {
+  _clearPointList() {
     this._pointPresenter.forEach((presenter) => presenter.destroy());
     this._pointPresenter.clear();
   }
