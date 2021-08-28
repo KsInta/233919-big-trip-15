@@ -189,6 +189,7 @@ class PointEdit extends AbstractView {
     this._point = point;
 
     this._formSubmitHandler = this._formSubmitHandler.bind(this);
+    this._formResetHandler = this._formResetHandler.bind(this);
   }
 
   getTemplate() {
@@ -197,12 +198,22 @@ class PointEdit extends AbstractView {
 
   _formSubmitHandler(evt) {
     evt.preventDefault();
-    this._callback.formSubmit();
+    this._callback.formSubmit(this._point);
   }
 
   setFormSubmitHandler(callback) {
     this._callback.formSubmit = callback;
     this.getElement().querySelector('form').addEventListener('submit', this._formSubmitHandler);
+  }
+
+  _formResetHandler(evt) {
+    evt.preventDefault();
+    this._callback.formReset();
+  }
+
+  setFormResetHandler(callback) {
+    this._callback.formReset = callback;
+    this.getElement().querySelector('form').addEventListener('reset', this._formResetHandler);
   }
 }
 
