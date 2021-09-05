@@ -1,24 +1,24 @@
 import AbstractView from './abstract.js';
 
-const createPointOfferTemplate = (offer) => {
+const createPointOfferTemplate = (offer, isOfferSelected) => {
   const {title, price} = offer;
 
-  return `<li class="event__offer">
+  return isOfferSelected ? `<li class="event__offer">
     <span class="event__offer-title">${title}</span>
     &plus;&euro;&nbsp;
     <span class="event__offer-price">${price}</span>
-  </li>`;
+  </li>` : '';
 };
 
-const createPointOffersTemplate = (offerItems) => {
-  const pointOffersTemplate = offerItems.map((offer) => createPointOfferTemplate(offer)).join('');
+const createPointOffersTemplate = (pointOffers, selectedOffers, isOffersExist) => {
+  const pointOffersTemplate = isOffersExist  ? pointOffers.offers.map((offer) =>
+    createPointOfferTemplate(offer, selectedOffers[`${pointOffers.type}-${pointOffers.offers.indexOf(offer)}`] === true)).join('') : '';
 
-  return `<ul class="event__selected-offers">${pointOffersTemplate}</ul>`;
+  return `${pointOffersTemplate}`;
 };
 
 const createPointTemplate = (point) => {
-  const {basePrice, dateFrom, dateTo, type, isFavorite, destination, offers} = point;
-
+  const {basePrice, dateFrom, dateTo, type, isFavorite, destination, pointOffers, offersSelected} = point;
   const favoriteClassName = isFavorite
     ? 'event__favorite-btn--active'
     : '';
@@ -27,7 +27,7 @@ const createPointTemplate = (point) => {
     <div class="event">
       <time class="event__date" datetime="2019-03-18">${dateFrom.pointStartFormatDay}</time>
       <div class="event__type">
-        <img class="event__type-icon" width="42" height="42" src="img/icons/taxi.png" alt="Event type icon">
+        <img class="event__type-icon" width="42" height="42" src="img/icons/${type}.png" alt="Event type icon">
       </div>
       <h3 class="event__title">${type} ${destination.name}</h3>
       <div class="event__schedule">
@@ -42,7 +42,9 @@ const createPointTemplate = (point) => {
         &euro;&nbsp;<span class="event__price-value">${basePrice}</span>
       </p>
       <h4 class="visually-hidden">Offers:</h4>
-      ${createPointOffersTemplate(offers)}
+      <ul class="event__selected-offers">
+      ${createPointOffersTemplate(pointOffers, offersSelected, pointOffers.offers !== null)}
+      </ul>
       <button class="event__favorite-btn ${favoriteClassName}" type="button">
         <span class="visually-hidden">Add to favorite</span>
         <svg class="event__favorite-icon" width="28" height="28" viewBox="0 0 28 28">
@@ -57,16 +59,16 @@ const createPointTemplate = (point) => {
 };
 
 class Point extends AbstractView {
-  constructor(task) {
+  constructor(point) {
     super();
-    this._task = task;
+    this._point = point;
 
     this._editClickHandler = this._editClickHandler.bind(this);
     this._favoriteClickHandler = this._favoriteClickHandler.bind(this);
   }
 
   getTemplate() {
-    return createPointTemplate(this._task);
+    return createPointTemplate(this._point);
   }
 
   _editClickHandler(evt) {
