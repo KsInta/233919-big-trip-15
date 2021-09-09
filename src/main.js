@@ -5,7 +5,6 @@ import BoardPresenter from './presenter/board.js';
 import {generatePoint} from './mock/point.js';
 import {generateFilter} from './filter.js';
 import {render, RenderPosition} from './utils/render.js';
-import flatpickr from 'flatpickr';
 
 const POINT_COUNT = 25;
 
@@ -27,17 +26,3 @@ render(siteMainTripElement, new MainTripView(), RenderPosition.AFTERBEGIN);
 const boardPresenter = new BoardPresenter(siteBodyContainerElement);
 
 boardPresenter.init(points);
-
-flatpickr('#event-start-time-1', {
-  altInput: true,
-  altFormat: 'F j, Y',
-  dateFormat: 'Y-m-d',
-  enableTime: true,
-});
-
-flatpickr('#event-end-time-1', {
-  altInput: true,
-  altFormat: 'F j, Y',
-  dateFormat: 'Y-m-d',
-  enableTime: true,
-});

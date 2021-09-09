@@ -17,9 +17,11 @@
     "node": "12"
   },
   "dependencies": {
+    "css-loader": "5.2.7",
     "dayjs": "1.10.6",
     "flatpickr": "4.6.9",
     "nanoid": "3.1.22",
+    "style-loader": "2.0.0",
     "webpack": "^4.44.2",
     "webpack-cli": "3.3.12",
     "webpack-dev-server": "^3.11.0"
