@@ -191,12 +191,12 @@ const generatePoint = () => {
     isExpired: isExpired(pointStartTime),
     basePrice: getRandomInteger(MIN_POINT_PRICE, MAX_POINT_PRICE),
     dateFrom: {
-      pointStartFormatDate: humanizePointDueDate(pointStartTime, 'YYYY-MM-DDTHH:mm:ss'),
+      pointStartFormatDate: humanizePointDueDate(pointStartTime, 'DD-MM-YYYYTHH:mm:ss'),
       pointStartFormatDay: humanizePointDueDate(pointStartTime, 'MMM DD'),
       pointStartFormatTime: humanizePointDueDate(pointStartTime, 'HH:mm'),
     },
     dateTo: {
-      pointEndFormatDate: humanizePointDueDate(pointEndTime, 'YYYY-MM-DDTHH:mm:ss'),
+      pointEndFormatDate: humanizePointDueDate(pointEndTime, 'DD-MM-YYYYTHH:mm:ss'),
       pointEndFormatTime: humanizePointDueDate(pointEndTime, 'HH:mm'),
       pointTimeLength,
     },

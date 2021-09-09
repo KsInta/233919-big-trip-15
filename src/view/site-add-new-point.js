@@ -1,6 +1,9 @@
 import SmartView from './smart.js';
 import {EVENT_OFFERS, CITIES, DESCRIPTION_TEXTS, PLUG_IMG_URL, MAX_DESCRIPTION_LENGTH, PLUG_IMG_URL_LIMIT} from '../mock/point.js';
 import {getRandomInteger, getRandomArray} from '../utils/common.js';
+import flatpickr from 'flatpickr';
+
+import '../../node_modules/flatpickr/dist/flatpickr.min.css';
 
 const BLANK_POINT = {
   type: EVENT_OFFERS[0].type,
@@ -140,14 +143,18 @@ class PointEdit extends SmartView {
   constructor(point = BLANK_POINT) {
     super();
     this._data = PointEdit.parsePointToData(point);
+    this._datepicker = null;
 
     this._formSubmitHandler = this._formSubmitHandler.bind(this);
     this._formResetHandler = this._formResetHandler.bind(this);
+    this._dueDateChangeHandler = this._dueDateChangeHandler.bind(this);
+    this._endDateChangeHandler = this._endDateChangeHandler.bind(this);
     this._offersTypeSelectHandler = this._offersTypeSelectHandler.bind(this);
     this._offersChangeHandler = this._offersChangeHandler.bind(this);
     this._cityChangeHandler = this._cityChangeHandler.bind(this);
 
     this._setInnerHandlers();
+    this._setDatepicker();
   }
 
   reset(point) {
@@ -162,8 +169,32 @@ class PointEdit extends SmartView {
 
   restoreHandlers() {
     this._setInnerHandlers();
+    this._setDatepicker();
     this.setFormSubmitHandler(this._callback.formSubmit);
     this.setFormResetHandler(this._callback.formReset);
+  }
+
+  _setDatepicker() {
+    if (this._datepicker) {
+      this._datepicker.destroy();
+      this._datepicker = null;
+    }
+
+    const initDatepicker = (selector, defaultDate, callback) => {
+      this._datepicker = flatpickr(
+        this.getElement().querySelector(selector),
+        {
+          enableTime: true,
+          dateFormat: 'd/m/Y H:i',
+          //time_24hr: true,
+          defaultDate,
+          onChange: callback,
+        },
+      );
+    };
+
+    initDatepicker('#event-start-time-1', this._data.dateFrom.pointStartFormatDate, this._dueDateChangeHandler);
+    initDatepicker('#event-end-time-1', this._data.dateTo.pointEndFormatDate, this._endDateChangeHandler);
   }
 
   _setInnerHandlers() {
@@ -176,6 +207,22 @@ class PointEdit extends SmartView {
     this.getElement()
       .querySelector('.event__field-group--destination')
       .addEventListener('change', this._cityChangeHandler);
+  }
+
+  _dueDateChangeHandler([userDate]) {
+    this.updateData({
+      dateFrom: {
+        pointStartFormatDate: userDate,
+      },
+    });
+  }
+
+  _endDateChangeHandler([userDate]) {
+    this.updateData({
+      dateTo: {
+        pointEndFormatDate: userDate,
+      },
+    });
   }
 
   _offersTypeSelectHandler(evt) {
