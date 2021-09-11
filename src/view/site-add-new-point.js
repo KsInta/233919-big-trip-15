@@ -1,12 +1,25 @@
+import he from 'he';
 import SmartView from './smart.js';
-import {EVENT_OFFERS, CITIES, DESCRIPTION_TEXTS, PLUG_IMG_URL, MAX_DESCRIPTION_LENGTH, PLUG_IMG_URL_LIMIT} from '../mock/point.js';
+import {EVENT_OFFERS, CITIES, DESCRIPTION_TEXTS, PLUG_IMG_URL, MAX_DESCRIPTION_LENGTH, PLUG_IMG_URL_LIMIT, MIN_POINT_PRICE, MAX_POINT_PRICE} from '../mock/point.js';
 import {getRandomInteger, getRandomArray} from '../utils/common.js';
+import {humanizePointDueDate} from '../utils/point.js';
+import dayjs from 'dayjs';
 import flatpickr from 'flatpickr';
 
 import '../../node_modules/flatpickr/dist/flatpickr.min.css';
 
+const blankOffers = EVENT_OFFERS[0];
+
 const BLANK_POINT = {
-  type: EVENT_OFFERS[0].type,
+  pointOffers: blankOffers,
+  type: blankOffers.type,
+  basePrice: getRandomInteger(MIN_POINT_PRICE, MAX_POINT_PRICE),
+  dateFrom: {
+    pointStartFormatDate: humanizePointDueDate(dayjs(), 'DD-MM-YYYY HH:mm:ss'),
+  },
+  dateTo: {
+    pointEndFormatDate: humanizePointDueDate(dayjs(), 'DD-MM-YYYY HH:mm:ss'),
+  },
   destination: {
     description: '',
     name: CITIES[0],
@@ -16,6 +29,8 @@ const BLANK_POINT = {
       },
     ],
   },
+  offers: blankOffers.offers,
+  offersSelected: {},
 };
 
 const createPointDestinationOption = (destination) => `<option value="${destination}"></option>`;
@@ -62,7 +77,7 @@ const createPointOffersTemplate = (pointOffers, selectedOffers, isOffersExist) =
 };
 
 const createPointEditTemplate = (data) => {
-  const {type, destination, basePrice, pointOffers, offersSelected, isOffersExist} = data;
+  const {type, destination, basePrice, pointOffers, offersSelected, isOffersExist, dateFrom, dateTo} = data;
   const POINT_TYPES = [];
   EVENT_OFFERS.map((pointType) => POINT_TYPES.push(pointType.type));
   const pointTypesTemplate = createPointTypesTemplate(type, POINT_TYPES);
@@ -89,7 +104,7 @@ const createPointEditTemplate = (data) => {
           <label class="event__label  event__type-output" for="event-destination-1">
             ${type}
           </label>
-          <input class="event__input  event__input--destination" id="event-destination-1" type="text" name="event-destination" value="${destination.name}" list="destination-list-1">
+          <input class="event__input  event__input--destination" id="event-destination-1" type="text" name="event-destination" value="${he.encode(destination.name)}" list="destination-list-1">
           <datalist id="destination-list-1">
             ${createPointsDestinationOption(CITIES)}
           </datalist>
@@ -97,10 +112,10 @@ const createPointEditTemplate = (data) => {
 
         <div class="event__field-group  event__field-group--time">
           <label class="visually-hidden" for="event-start-time-1">From</label>
-          <input class="event__input  event__input--time" id="event-start-time-1" type="text" name="event-start-time" value="19/03/19 00:00">
+          <input class="event__input  event__input--time" id="event-start-time-1" type="text" name="event-start-time" value="${dateFrom.pointStartFormatDate}">
           &mdash;
           <label class="visually-hidden" for="event-end-time-1">To</label>
-          <input class="event__input  event__input--time" id="event-end-time-1" type="text" name="event-end-time" value="19/03/19 00:00">
+          <input class="event__input  event__input--time" id="event-end-time-1" type="text" name="event-end-time" value="${dateTo.pointEndFormatDate}">
         </div>
 
         <div class="event__field-group  event__field-group--price">
@@ -108,7 +123,7 @@ const createPointEditTemplate = (data) => {
             <span class="visually-hidden">Price</span>
             &euro;
           </label>
-          <input class="event__input  event__input--price" id="event-price-1" type="text" name="event-price" value="${basePrice}">
+          <input class="event__input  event__input--price" id="event-price-1" type="number" name="event-price" value="${basePrice}">
         </div>
 
         <button class="event__save-btn  btn  btn--blue" type="submit">Save</button>
@@ -146,15 +161,26 @@ class PointEdit extends SmartView {
     this._datepicker = null;
 
     this._formSubmitHandler = this._formSubmitHandler.bind(this);
-    this._formResetHandler = this._formResetHandler.bind(this);
+    this._formDeleteClickHandler = this._formDeleteClickHandler.bind(this);
+    //this._formResetHandler = this._formResetHandler.bind(this);
     this._dueDateChangeHandler = this._dueDateChangeHandler.bind(this);
     this._endDateChangeHandler = this._endDateChangeHandler.bind(this);
     this._offersTypeSelectHandler = this._offersTypeSelectHandler.bind(this);
     this._offersChangeHandler = this._offersChangeHandler.bind(this);
     this._cityChangeHandler = this._cityChangeHandler.bind(this);
+    this._priceChangeHandler = this._priceChangeHandler.bind(this);
 
     this._setInnerHandlers();
     this._setDatepicker();
+  }
+
+  removeElement() {
+    super.removeElement();
+
+    if (this._datepicker) {
+      this._datepicker.destroy();
+      this._datepicker = null;
+    }
   }
 
   reset(point) {
@@ -171,7 +197,8 @@ class PointEdit extends SmartView {
     this._setInnerHandlers();
     this._setDatepicker();
     this.setFormSubmitHandler(this._callback.formSubmit);
-    this.setFormResetHandler(this._callback.formReset);
+    //this.setFormResetHandler(this._callback.formReset);
+    this.setDeleteClickHandler(this._callback.deleteClick);
   }
 
   _setDatepicker() {
@@ -186,7 +213,7 @@ class PointEdit extends SmartView {
         {
           enableTime: true,
           dateFormat: 'd/m/Y H:i',
-          //time_24hr: true,
+          time_24hr: true,
           defaultDate,
           onChange: callback,
         },
@@ -207,21 +234,35 @@ class PointEdit extends SmartView {
     this.getElement()
       .querySelector('.event__field-group--destination')
       .addEventListener('change', this._cityChangeHandler);
+    this.getElement()
+      .querySelector('.event__input--price')
+      .addEventListener('change', this._priceChangeHandler);
   }
 
   _dueDateChangeHandler([userDate]) {
     this.updateData({
-      dateFrom: {
-        pointStartFormatDate: userDate,
-      },
+      dateFrom: Object.assign(
+        {},
+        this._data.dateFrom,
+        {
+          pointStartFormatDate: humanizePointDueDate(userDate, 'DD-MM-YYYY HH:mm:ss'),
+          pointStartFormatDay: humanizePointDueDate(userDate, 'MMM DD'),
+          pointStartFormatTime: humanizePointDueDate(userDate, 'HH:mm'),
+        },
+      ),
     });
   }
 
   _endDateChangeHandler([userDate]) {
     this.updateData({
-      dateTo: {
-        pointEndFormatDate: userDate,
-      },
+      dateTo: Object.assign(
+        {},
+        this._data.dateTo,
+        {
+          pointEndFormatDate: humanizePointDueDate(userDate, 'DD-MM-YYYY HH:mm:ss'),
+          pointEndFormatTime: humanizePointDueDate(userDate, 'HH:mm'),
+        },
+      ),
     });
   }
 
@@ -273,6 +314,12 @@ class PointEdit extends SmartView {
     });
   }
 
+  _priceChangeHandler(evt) {
+    this.updateData({
+      basePrice: evt.target.value,
+    });
+  }
+
   _formSubmitHandler(evt) {
     evt.preventDefault();
     this._callback.formSubmit(PointEdit.parseDataToPoint(this._data));
@@ -283,7 +330,17 @@ class PointEdit extends SmartView {
     this.getElement().querySelector('form').addEventListener('submit', this._formSubmitHandler);
   }
 
-  _formResetHandler(evt) {
+  _formDeleteClickHandler(evt) {
+    evt.preventDefault();
+    this._callback.deleteClick(PointEdit.parseDataToPoint(this._data));
+  }
+
+  setDeleteClickHandler(callback) {
+    this._callback.deleteClick = callback;
+    this.getElement().querySelector('.event__reset-btn').addEventListener('click', this._formDeleteClickHandler);
+  }
+
+  /*_formResetHandler(evt) {
     evt.preventDefault();
     this._callback.formReset();
   }
@@ -291,7 +348,7 @@ class PointEdit extends SmartView {
   setFormResetHandler(callback) {
     this._callback.formReset = callback;
     this.getElement().querySelector('form').addEventListener('reset', this._formResetHandler);
-  }
+  }*/
 
   static parsePointToData(point) {
     return Object.assign(
