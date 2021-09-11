@@ -32,9 +32,9 @@ const createPointTemplate = (point) => {
       <h3 class="event__title">${type} ${destination.name}</h3>
       <div class="event__schedule">
         <p class="event__time">
-          <time class="event__start-time" datetime="2019-03-18T10:30">${dateFrom.pointStartFormatTime}</time>
+          <time class="event__start-time" datetime="${dateFrom.pointStartFormatDate}">${dateFrom.pointStartFormatTime}</time>
           &mdash;
-          <time class="event__end-time" datetime="2019-03-18T11:00">${dateTo.pointEndFormatTime}</time>
+          <time class="event__end-time" datetime="${dateFrom.pointStartFormatDate}">${dateTo.pointEndFormatTime}</time>
         </p>
         <p class="event__duration">${dateTo.pointTimeLength}M</p>
       </div>

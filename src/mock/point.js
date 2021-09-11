@@ -162,7 +162,7 @@ const PLUG_IMG_URL_LIMIT = 1000;
 const MIN_POINT_PRICE = 100;
 const MAX_POINT_PRICE = 10000;
 const MIN_POINT_TIME_MINUTES_LENGTH = 5;
-const MAX_POINT_TIME_MINUTES_LENGTH = 60;
+const MAX_POINT_TIME_MINUTES_LENGTH = 300;
 
 const generateDate = () => {
 
@@ -191,7 +191,7 @@ const generatePoint = () => {
     isExpired: isExpired(pointStartTime),
     basePrice: getRandomInteger(MIN_POINT_PRICE, MAX_POINT_PRICE),
     dateFrom: {
-      pointStartFormatDate: humanizePointDueDate(pointStartTime, 'DD-MM-YYYYTHH:mm:ss'),
+      pointStartFormatDate: humanizePointDueDate(pointStartTime, 'DD-MM-YYYY HH:mm:ss'),
       pointStartFormatDay: humanizePointDueDate(pointStartTime, 'MMM DD'),
       pointStartFormatTime: humanizePointDueDate(pointStartTime, 'HH:mm'),
     },
@@ -216,4 +216,4 @@ const generatePoint = () => {
   };
 };
 
-export {generatePoint, CITIES, PLUG_IMG_URL, EVENT_OFFERS, DESCRIPTION_TEXTS, MAX_DESCRIPTION_LENGTH, PLUG_IMG_URL_LIMIT};
+export {generatePoint, CITIES, PLUG_IMG_URL, EVENT_OFFERS, DESCRIPTION_TEXTS, MAX_DESCRIPTION_LENGTH, PLUG_IMG_URL_LIMIT, MIN_POINT_PRICE, MAX_POINT_PRICE};
