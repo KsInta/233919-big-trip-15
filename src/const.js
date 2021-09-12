@@ -22,4 +22,10 @@ const FilterType = {
   PAST: 'PAST',
 };
 
-export {SortType, UserAction, UpdateType, FilterType};
+const MenuItem = {
+  ADD_NEW_POINT: 'ADD_NEW_POINT',
+  POINTS: 'POINTS',
+  STATISTICS: 'STATISTICS',
+};
+
+export {SortType, UserAction, UpdateType, FilterType, MenuItem};

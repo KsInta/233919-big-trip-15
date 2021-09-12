@@ -158,7 +158,8 @@ class PointEdit extends SmartView {
   constructor(point = BLANK_POINT) {
     super();
     this._data = PointEdit.parsePointToData(point);
-    this._datepicker = null;
+    this._datepickerStart = null;
+    this._datepickerEnd = null;
 
     this._formSubmitHandler = this._formSubmitHandler.bind(this);
     this._formDeleteClickHandler = this._formDeleteClickHandler.bind(this);
@@ -177,9 +178,11 @@ class PointEdit extends SmartView {
   removeElement() {
     super.removeElement();
 
-    if (this._datepicker) {
-      this._datepicker.destroy();
-      this._datepicker = null;
+    if (this._datepickerStart || this._datepickerEnd) {
+      this._datepickerStart.destroy();
+      this._datepickerEnd.destroy();
+      this._datepickerStart = null;
+      this._datepickerEnd = null;
     }
   }
 
@@ -202,26 +205,34 @@ class PointEdit extends SmartView {
   }
 
   _setDatepicker() {
-    if (this._datepicker) {
-      this._datepicker.destroy();
-      this._datepicker = null;
+    if (this._datepickerStart || this._datepickerEnd) {
+      this._datepickerStart.destroy();
+      this._datepickerEnd.destroy();
+      this._datepickerStart = null;
+      this._datepickerEnd = null;
     }
 
-    const initDatepicker = (selector, defaultDate, callback) => {
-      this._datepicker = flatpickr(
-        this.getElement().querySelector(selector),
-        {
-          enableTime: true,
-          dateFormat: 'd/m/Y H:i',
-          time_24hr: true,
-          defaultDate,
-          onChange: callback,
-        },
-      );
-    };
+    this._datepickerStart = flatpickr(
+      this.getElement().querySelector('#event-start-time-1'),
+      {
+        enableTime: true,
+        dateFormat: 'd/m/Y H:i',
+        time_24hr: true,
+        defaultDate: this._data.dateFrom.pointStartFormatDate,
+        onChange: this._dueDateChangeHandler,
+      },
+    );
 
-    initDatepicker('#event-start-time-1', this._data.dateFrom.pointStartFormatDate, this._dueDateChangeHandler);
-    initDatepicker('#event-end-time-1', this._data.dateTo.pointEndFormatDate, this._endDateChangeHandler);
+    this._datepickerEnd = flatpickr(
+      this.getElement().querySelector('#event-end-time-1'),
+      {
+        enableTime: true,
+        dateFormat: 'd/m/Y H:i',
+        time_24hr: true,
+        defaultDate: this._data.dateTo.pointEndFormatDate,
+        onChange: this._endDateChangeHandler,
+      },
+    );
   }
 
   _setInnerHandlers() {
@@ -316,7 +327,7 @@ class PointEdit extends SmartView {
 
   _priceChangeHandler(evt) {
     this.updateData({
-      basePrice: evt.target.value,
+      basePrice: +evt.target.value,
     });
   }
 
