@@ -1,5 +1,6 @@
 import PointListView from '../view/site-points-list.js';
 import SortView from '../view/site-sorting.js';
+import LoadingView from '../view/loading.js';
 import NoPointView from '../view/no-point.js';
 import PointPresenter from './point.js';
 import PointNewPresenter from './point-new.js';
@@ -9,23 +10,28 @@ import {filter} from '../utils/filter.js';
 import {SortType, UpdateType, UserAction, FilterType} from '../const.js';
 
 class Board {
-  constructor(boardContainer, pointsModel, filterModel) {
+  constructor(boardContainer, pointsModel, filterModel, api) {
+    this._api = api;
     this._pointsModel = pointsModel;
     this._filterModel = filterModel;
     this._boardContainer = boardContainer;
     this._pointPresenter = new Map();
     this._filterType = FilterType.ALL;
     this._currentSortType = SortType.DEFAULT;
+    this._isLoading = true;
 
     this._sortComponent = null;
     this._noPointComponent = null;
 
     this._pointListComponent = new PointListView();
+    this._loadingComponent = new LoadingView();
 
     this._handleViewAction = this._handleViewAction.bind(this);
     this._handleModelEvent = this._handleModelEvent.bind(this);
     this._handleModeChange = this._handleModeChange.bind(this);
     this._handleSortTypeChange = this._handleSortTypeChange.bind(this);
+
+    this._windowOnlineHandler = this._windowOnlineHandler.bind(this);
 
     this._pointNewPresenter = new PointNewPresenter(this._pointListComponent, this._handleViewAction);
   }
@@ -35,6 +41,9 @@ class Board {
 
     this._pointsModel.addObserver(this._handleModelEvent);
     this._filterModel.addObserver(this._handleModelEvent);
+
+    window.addEventListener('online', this._windowOnlineHandler);
+    this._windowOnlineHandler();
 
     this._renderBoard();
   }
@@ -98,6 +107,11 @@ class Board {
         this._clearBoard({resetSortType: true});
         this._renderBoard();
         break;
+      case UpdateType.INIT:
+        this._isLoading = false;
+        remove(this._loadingComponent);
+        this._renderBoard();
+        break;
     }
   }
 
@@ -123,13 +137,19 @@ class Board {
   }
 
   _renderPoint(point) {
-    const pointPresenter = new PointPresenter(this._pointListComponent, this._handleViewAction, this._handleModeChange);
+    const pointPresenter = new PointPresenter(this._pointListComponent, this._handleViewAction, this._handleModeChange, this._offers);
     pointPresenter.init(point);
     this._pointPresenter.set(point.id, pointPresenter);
   }
 
   _renderPoints(points) {
-    points.forEach((boardPoint) => this._renderPoint(boardPoint));
+    points.forEach((boardPoint) => {
+      this._renderPoint(boardPoint);
+    });
+  }
+
+  _renderLoading() {
+    render(this._boardContainer, this._loadingComponent, RenderPosition.AFTERBEGIN);
   }
 
   _renderNoPoints() {
@@ -144,6 +164,7 @@ class Board {
     this._pointNewPresenter.destroy();
 
     remove(this._sortComponent);
+    remove(this._loadingComponent);
 
     if (this._noPointComponent) {
       remove(this._noPointComponent);
@@ -155,6 +176,11 @@ class Board {
   }
 
   _renderBoard() {
+    if (this._isLoading) {
+      this._renderLoading();
+      return;
+    }
+
     const points = this._getPoints();
     const pointCount = points.length;
 
@@ -164,6 +190,24 @@ class Board {
     }
     this._renderSort();
     this._renderPoints(points);
+  }
+
+  _setOffersAndDestinations(offers) {
+    this._offers = offers;
+    console.log(this._pointPresenter, this._offers);
+    this._pointPresenter.forEach((presenter) => {
+      presenter._setOffersAndDestinations(offers);
+    });
+  }
+
+  async _windowOnlineHandler() {
+    try {
+      const offers = await this._api.getOffers();
+
+      this._setOffersAndDestinations(offers);
+    } catch (error) {
+      alert(error.message);
+    }
   }
 }
 

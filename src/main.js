@@ -5,16 +5,20 @@ import BoardPresenter from './presenter/board.js';
 import FilterPresenter from './presenter/filter.js';
 import PointsModel from './model/points.js';
 import FilterModel from './model/filter.js';
-import {generatePoint} from './mock/point.js';
+//import {generatePoint} from './mock/point.js';
 import {render, RenderPosition, remove} from './utils/render.js';
 import {MenuItem, UpdateType, FilterType} from './const.js';
+import Api from './api.js';
 
-const POINT_COUNT = 25;
+//const POINT_COUNT = 25;
+const AUTHORIZATION = 'Basic zh9a590vi02031a';
+const END_POINT = 'https://15.ecmascript.pages.academy/big-trip';
 
-const points = new Array(POINT_COUNT).fill().map(generatePoint);
+//const points = new Array(POINT_COUNT).fill().map(generatePoint);
+const api = new Api(END_POINT, AUTHORIZATION);
 
 const pointsModel = new PointsModel();
-pointsModel.setPoints(points);
+//pointsModel.setPoints(points);
 
 const filterModel = new FilterModel();
 
@@ -31,7 +35,7 @@ const siteBodyContainerElement = siteBodyElement.querySelector('.trip-events');
 render(siteNavigationElement, siteMenuComponent, RenderPosition.BEFOREEND);
 render(siteMainTripElement, new MainTripView(), RenderPosition.AFTERBEGIN);
 
-const boardPresenter = new BoardPresenter(siteBodyContainerElement, pointsModel, filterModel);
+const boardPresenter = new BoardPresenter(siteBodyContainerElement, pointsModel, filterModel, api);
 const filterPresenter = new FilterPresenter(siteFilterElement, filterModel, pointsModel);
 
 const handlePointNewFormClose = () => {
@@ -48,7 +52,6 @@ const handleSiteMenuClick = (menuItem) => {
       boardPresenter.destroy();
       filterModel.setFilter(UpdateType.MAJOR, FilterType.EVERYTHING);
       boardPresenter.init();
-      console.log(pointsModel);
       boardPresenter.createPoint(handlePointNewFormClose);
       siteMenuComponent.getElement().querySelector(`[data-target=${MenuItem.POINTS}]`).style['pointer-events'] = 'none';
       break;
@@ -70,3 +73,12 @@ siteMenuComponent.setMenuClickHandler(handleSiteMenuClick);
 
 filterPresenter.init();
 boardPresenter.init();
+
+api.getPoints()
+  .then((points) => {
+    //console.log(pointsModel);
+    pointsModel.setPoints(UpdateType.INIT, points);
+  });
+  //.catch(() => {
+    //pointsModel.setPoints(UpdateType.INIT, []);
+  //});

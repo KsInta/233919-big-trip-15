@@ -1,24 +1,18 @@
 import AbstractView from './abstract.js';
 
-const createPointOfferTemplate = (offer, isOfferSelected) => {
+const createPointOfferTemplate = (offer) => {
   const {title, price} = offer;
 
-  return isOfferSelected ? `<li class="event__offer">
+  return `<li class="event__offer">
     <span class="event__offer-title">${title}</span>
     &plus;&euro;&nbsp;
     <span class="event__offer-price">${price}</span>
-  </li>` : '';
-};
-
-const createPointOffersTemplate = (pointOffers, selectedOffers, isOffersExist) => {
-  const pointOffersTemplate = isOffersExist  ? pointOffers.offers.map((offer) =>
-    createPointOfferTemplate(offer, selectedOffers[`${pointOffers.type}-${pointOffers.offers.indexOf(offer)}`] === true)).join('') : '';
-
-  return `${pointOffersTemplate}`;
+  </li>`;
 };
 
 const createPointTemplate = (point) => {
-  const {basePrice, dateFrom, dateTo, type, isFavorite, destination, pointOffers, offersSelected} = point;
+  const {basePrice, dateFrom, dateTo, type, isFavorite, destination, offersSelected} = point;
+  const offersListTemplate = offersSelected.map(createPointOfferTemplate).join('');
   const favoriteClassName = isFavorite
     ? 'event__favorite-btn--active'
     : '';
@@ -43,7 +37,7 @@ const createPointTemplate = (point) => {
       </p>
       <h4 class="visually-hidden">Offers:</h4>
       <ul class="event__selected-offers">
-      ${createPointOffersTemplate(pointOffers, offersSelected, pointOffers.offers !== null)}
+      ${offersListTemplate}
       </ul>
       <button class="event__favorite-btn ${favoriteClassName}" type="button">
         <span class="visually-hidden">Add to favorite</span>

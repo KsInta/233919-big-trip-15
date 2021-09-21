@@ -1,5 +1,6 @@
 import he from 'he';
 import SmartView from './smart.js';
+import Api from '../api.js';
 import {EVENT_OFFERS, CITIES, DESCRIPTION_TEXTS, PLUG_IMG_URL, MAX_DESCRIPTION_LENGTH, PLUG_IMG_URL_LIMIT, MIN_POINT_PRICE, MAX_POINT_PRICE} from '../mock/point.js';
 import {getRandomInteger, getRandomArray} from '../utils/common.js';
 import {humanizePointDueDate} from '../utils/point.js';
@@ -69,7 +70,6 @@ const createPointOfferTemplate = (offers, val, isOfferChecked) => {
 };
 
 const createPointOffersTemplate = (pointOffers, selectedOffers, isOffersExist) => {
-
   const pointOffersTemplate = isOffersExist  ? pointOffers.offers.map((offer) =>
     createPointOfferTemplate(offer, `${pointOffers.type}-${pointOffers.offers.indexOf(offer)}`, selectedOffers[`${pointOffers.type}-${pointOffers.offers.indexOf(offer)}`] === true)).join('') : '';
 
@@ -81,7 +81,7 @@ const createPointEditTemplate = (data) => {
   const POINT_TYPES = [];
   EVENT_OFFERS.map((pointType) => POINT_TYPES.push(pointType.type));
   const pointTypesTemplate = createPointTypesTemplate(type, POINT_TYPES);
-  const pointOffersTemplate = createPointOffersTemplate(pointOffers, offersSelected,  isOffersExist);
+  //const pointOffersTemplate = createPointOffersTemplate(pointOffers, offersSelected,  isOffersExist);
 
   return `<li class="trip-events__item">
     <form class="event event--edit" action="#" method="post">
@@ -134,7 +134,7 @@ const createPointEditTemplate = (data) => {
           <h3 class="event__section-title  event__section-title--offers">Offers</h3>
 
           <div class="event__available-offers">
-            ${pointOffersTemplate}
+
           </div>
         </section>
 
@@ -155,11 +155,13 @@ const createPointEditTemplate = (data) => {
 };
 
 class PointEdit extends SmartView {
-  constructor(point = BLANK_POINT) {
+  constructor(point = BLANK_POINT, offers = []) {
     super();
     this._data = PointEdit.parsePointToData(point);
     this._datepickerStart = null;
     this._datepickerEnd = null;
+
+    this._offers = [ ...offers ];
 
     this._formSubmitHandler = this._formSubmitHandler.bind(this);
     this._formDeleteClickHandler = this._formDeleteClickHandler.bind(this);
@@ -193,6 +195,7 @@ class PointEdit extends SmartView {
   }
 
   getTemplate() {
+    console.log(this._data);
     return createPointEditTemplate(this._data);
   }
 
@@ -292,7 +295,7 @@ class PointEdit extends SmartView {
       pointOffers,
       type: pointOffers.type,
       offers: pointOffers.offers,
-      offersSelected: {},
+      offersSelected: [],
       isOffersExist,
     });
   }
