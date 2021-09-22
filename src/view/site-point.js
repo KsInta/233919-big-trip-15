@@ -1,49 +1,47 @@
 import AbstractView from './abstract.js';
+import {humanizePointDueDate, getDurationFormated} from '../utils/point.js';
 
-const createPointOfferTemplate = (offer, isOfferSelected) => {
+const createPointOfferTemplate = (offer) => {
   const {title, price} = offer;
 
-  return isOfferSelected ? `<li class="event__offer">
+  return `<li class="event__offer">
     <span class="event__offer-title">${title}</span>
     &plus;&euro;&nbsp;
     <span class="event__offer-price">${price}</span>
-  </li>` : '';
-};
-
-const createPointOffersTemplate = (pointOffers, selectedOffers, isOffersExist) => {
-  const pointOffersTemplate = isOffersExist  ? pointOffers.offers.map((offer) =>
-    createPointOfferTemplate(offer, selectedOffers[`${pointOffers.type}-${pointOffers.offers.indexOf(offer)}`] === true)).join('') : '';
-
-  return `${pointOffersTemplate}`;
+  </li>`;
 };
 
 const createPointTemplate = (point) => {
-  const {basePrice, dateFrom, dateTo, type, isFavorite, destination, pointOffers, offersSelected} = point;
+  const {basePrice, dateFrom, dateTo, type, isFavorite, destination, offersSelected} = point;
+
+  const offersListTemplate = offersSelected.map(createPointOfferTemplate).join('');
+  const duration = getDurationFormated(dateFrom, dateTo);
+
   const favoriteClassName = isFavorite
     ? 'event__favorite-btn--active'
     : '';
 
   return `<li class="trip-events__item">
     <div class="event">
-      <time class="event__date" datetime="2019-03-18">${dateFrom.pointStartFormatDay}</time>
+      <time class="event__date" datetime="${humanizePointDueDate(dateFrom, 'DD-MM-YYYY')}">${humanizePointDueDate(dateFrom, 'MMM DD')}</time>
       <div class="event__type">
         <img class="event__type-icon" width="42" height="42" src="img/icons/${type}.png" alt="Event type icon">
       </div>
       <h3 class="event__title">${type} ${destination.name}</h3>
       <div class="event__schedule">
         <p class="event__time">
-          <time class="event__start-time" datetime="${dateFrom.pointStartFormatDate}">${dateFrom.pointStartFormatTime}</time>
+          <time class="event__start-time" datetime="${humanizePointDueDate(dateFrom, 'DD-MM-YYYY HH:mm:ss')}">${humanizePointDueDate(dateFrom, 'HH:mm')}</time>
           &mdash;
-          <time class="event__end-time" datetime="${dateFrom.pointStartFormatDate}">${dateTo.pointEndFormatTime}</time>
+          <time class="event__end-time" datetime="${humanizePointDueDate(dateTo, 'DD-MM-YYYY HH:mm:ss')}">${humanizePointDueDate(dateTo, 'HH:mm')}</time>
         </p>
-        <p class="event__duration">${dateTo.pointTimeLength}M</p>
+        <p class="event__duration">${duration}</p>
       </div>
       <p class="event__price">
         &euro;&nbsp;<span class="event__price-value">${basePrice}</span>
       </p>
       <h4 class="visually-hidden">Offers:</h4>
       <ul class="event__selected-offers">
-      ${createPointOffersTemplate(pointOffers, offersSelected, pointOffers.offers !== null)}
+      ${offersListTemplate}
       </ul>
       <button class="event__favorite-btn ${favoriteClassName}" type="button">
         <span class="visually-hidden">Add to favorite</span>

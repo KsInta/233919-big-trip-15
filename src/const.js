@@ -1,3 +1,10 @@
+const Endpoints = {
+  POINTS: 'points',
+  OFFERS: 'offers',
+  DESTINATIONS: 'destinations',
+  SYNC: 'sync',
+};
+
 const SortType = {
   DEFAULT: 'day',
   TIME: 'time',
@@ -14,10 +21,11 @@ const UpdateType = {
   PATCH: 'PATCH',
   MINOR: 'MINOR',
   MAJOR: 'MAJOR',
+  INIT: 'INIT',
 };
 
 const FilterType = {
-  EVERYTHING: 'everything',
+  EVERYTHING: 'EVERYTHING',
   FUTURE: 'FUTURE',
   PAST: 'PAST',
 };
@@ -28,4 +36,17 @@ const MenuItem = {
   STATISTICS: 'STATISTICS',
 };
 
-export {SortType, UserAction, UpdateType, FilterType, MenuItem};
+const BLANK_POINT = {
+  type: 'train',
+  basePrice: 100,
+  dateFrom: new Date().toISOString(),
+  dateTo: new Date().toISOString(),
+  destination: {
+    description: '',
+    name: 'Tokio',
+    pictures: [],
+  },
+  offersSelected: [],
+};
+
+export {Endpoints, SortType, UserAction, UpdateType, FilterType, MenuItem, BLANK_POINT};
