@@ -11,4 +11,6 @@ const getRandomArray = (parentArray, length) => {
   return description;
 };
 
-export {getRandomInteger, getRandomArrayElement, getRandomArray};
+const isOnline = () => window.navigator.onLine;
+
+export {getRandomInteger, getRandomArrayElement, getRandomArray, isOnline};

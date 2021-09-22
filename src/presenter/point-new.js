@@ -1,5 +1,6 @@
 import PointEditView from '../view/site-add-new-point.js';
-import {nanoid} from 'nanoid';
+import {BLANK_POINT} from '../const.js';
+//import {nanoid} from 'nanoid';
 import {remove, render, RenderPosition} from '../utils/render.js';
 import {UserAction, UpdateType} from '../const.js';
 
@@ -16,20 +17,27 @@ class PointNew {
     this._escKeyDownHandler = this._escKeyDownHandler.bind(this);
   }
 
-  init(callback) {
-    this._destroyCallback = callback;
-
+  init(offers, destinations, callback) {
     if (this._pointEditComponent !== null) {
       return;
     }
 
-    this._pointEditComponent = new PointEditView();
+    this._destroyCallback = callback;
+
+    this._pointEditComponent = new PointEditView(BLANK_POINT, offers, destinations);
     this._pointEditComponent.setFormSubmitHandler(this._handleFormSubmit);
     this._pointEditComponent.setDeleteClickHandler(this._handleDeleteClick);
 
     render(this._pointListContainer, this._pointEditComponent, RenderPosition.AFTERBEGIN);
 
     document.addEventListener('keydown', this._escKeyDownHandler);
+  }
+
+  setSaving() {
+    this._pointEditComponent.updateData({
+      isDisabled: true,
+      isSaving: true,
+    });
   }
 
   destroy() {
@@ -47,13 +55,24 @@ class PointNew {
     document.removeEventListener('keydown', this._escKeyDownHandler);
   }
 
+  setAborting() {
+    const resetFormState = () => {
+      this._pointEditComponent.updateData({
+        isDisabled: false,
+        isSaving: false,
+        isDeleting: false,
+      });
+    };
+
+    this._pointEditComponent.shake(resetFormState);
+  }
+
   _handleFormSubmit(point) {
     this._changeData(
       UserAction.ADD_POINT,
       UpdateType.MINOR,
-      Object.assign({id: nanoid()}, point),
+      point,
     );
-    this.destroy();
   }
 
   _handleDeleteClick() {

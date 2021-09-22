@@ -1,6 +1,4 @@
 import AbstractObserver from '../utils/abstract-observer.js';
-import {humanizePointDueDate} from '../utils/point.js';
-import dayjs from 'dayjs';
 
 class Points extends AbstractObserver {
   constructor() {
@@ -59,25 +57,14 @@ class Points extends AbstractObserver {
   }
 
   static adaptToClient(point) {
-    const pointStartFormatDate = dayjs(point['date_from']);
-    const pointEndFormatDate = dayjs(point['date_to']);
-    const pointTimeLength = pointEndFormatDate.diff(pointStartFormatDate, 'm');
 
     const adaptedPoint = Object.assign(
       {},
       point,
       {
         basePrice: point['base_price'],
-        dateFrom: {
-          pointStartFormatDate,
-          pointStartFormatDay: humanizePointDueDate(point['date_from'], 'MMM DD'),
-          pointStartFormatTime: humanizePointDueDate(point['date_from'], 'HH:mm'),
-        },
-        dateTo: {
-          pointEndFormatDate,
-          pointEndFormatTime: humanizePointDueDate(point['date_to'], 'HH:mm'),
-          pointTimeLength,
-        },
+        dateFrom: point['date_from'],
+        dateTo: point['date_to'],
         isFavorite: point['is_favorite'],
         offersSelected: point['offers'],
       },
@@ -98,14 +85,13 @@ class Points extends AbstractObserver {
       point,
       {
         'base_price': point.basePrice,
-        'date_from': point.dateFrom.pointStartFormatDate.toISOString(),
-        'date_to': point.dateTo.pointEndFormatDate.toISOString(),
+        'date_from': point.dateFrom,
+        'date_to': point.dateTo,
         'is_favorite': point.isFavorite,
         'offers': point.offersSelected,
       },
     );
 
-    // Ненужные ключи мы удаляем
     delete adaptedPoint.basePrice;
     delete adaptedPoint.dateFrom;
     delete adaptedPoint.dateTo;

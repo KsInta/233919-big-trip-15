@@ -1,5 +1,6 @@
 import PointView from '../view/site-point.js';
 import PointEditView from '../view/site-add-new-point.js';
+import { isOnline } from '../utils/common.js';
 import {isDatesEqual} from '../utils/point.js';
 import {render, RenderPosition, replace, remove} from '../utils/render.js';
 import {UserAction, UpdateType} from '../const.js';
@@ -9,10 +10,15 @@ const Mode = {
   EDITING: 'EDITING',
 };
 
+export const State = {
+  SAVING: 'SAVING',
+  DELETING: 'DELETING',
+  ABORTING: 'ABORTING',
+};
+
 class Point {
-  constructor(pointListContainer, changeData, changeMode, offers = []) {
+  constructor(pointListContainer, changeData, changeMode) {
     this._pointListContainer = pointListContainer;
-    this._offers = [ ...offers ];
     this._changeData = changeData;
     this._changeMode = changeMode;
 
@@ -28,20 +34,26 @@ class Point {
     this._escKeyDownHandler = this._escKeyDownHandler.bind(this);
   }
 
-  init(point) {
+  init(point, offers, destinations) {
     this._point = point;
 
     const prevPointComponent = this._pointComponent;
     const prevPointEditComponent = this._pointEditComponent;
 
     this._pointComponent = new PointView(point);
-    this._pointEditComponent = new PointEditView(point, this._offers);
+
+    if(isOnline()) {
+      this._pointEditComponent = new PointEditView(point, offers, destinations);
+      this._pointEditComponent.setFormSubmitHandler(this._handleFormSubmit);
+      //this._pointEditComponent.setClickCloseHandler(this._handleClickClose);
+      this._pointEditComponent.setDeleteClickHandler(this._handleDeleteClick);
+    }
 
     this._pointComponent.setEditClickHandler(this._handleEditClick);
     this._pointComponent.setFavoriteClickHandler(this._handleFavoriteClick);
-    this._pointEditComponent.setFormSubmitHandler(this._handleFormSubmit);
+    //this._pointEditComponent.setFormSubmitHandler(this._handleFormSubmit);
     //this._pointEditComponent.setFormResetHandler(this._handleFormReset);
-    this._pointEditComponent.setDeleteClickHandler(this._handleDeleteClick);
+    //this._pointEditComponent.setDeleteClickHandler(this._handleDeleteClick);
 
     if (prevPointComponent === null || prevPointEditComponent === null) {
       render(this._pointListContainer, this._pointComponent, RenderPosition.BEFOREEND);
@@ -53,7 +65,8 @@ class Point {
     }
 
     if (this._mode === Mode.EDITING) {
-      replace(this._pointEditComponent, prevPointEditComponent);
+      replace(this._pointComponent, prevPointEditComponent);
+      this._mode = Mode.DEFAULT;
     }
 
     remove(prevPointComponent);
@@ -68,6 +81,39 @@ class Point {
   resetView() {
     if (this._mode !== Mode.DEFAULT) {
       this._replaceFormToCard();
+    }
+  }
+
+  setViewState(state) {
+    if (this._mode === Mode.DEFAULT) {
+      return;
+    }
+
+    const resetFormState = () => {
+      this._pointEditComponent.updateData({
+        isDisabled: false,
+        isSaving: false,
+        isDeleting: false,
+      });
+    };
+
+    switch (state) {
+      case State.SAVING:
+        this._pointEditComponent.updateData({
+          isDisabled: true,
+          isSaving: true,
+        });
+        break;
+      case State.DELETING:
+        this._pointEditComponent.updateData({
+          isDisabled: true,
+          isDeleting: true,
+        });
+        break;
+      case State.ABORTING:
+        this._pointComponent.shake(resetFormState);
+        this._pointEditComponent.shake(resetFormState);
+        break;
     }
   }
 
