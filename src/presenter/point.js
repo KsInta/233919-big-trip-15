@@ -1,5 +1,5 @@
-import PointView from '../view/site-point.js';
-import PointEditView from '../view/site-add-new-point.js';
+import PointView from '../view/point.js';
+import PointEditView from '../view/point-edit.js';
 import { isOnline } from '../utils/common.js';
 import {isDatesEqual} from '../utils/point.js';
 import {render, RenderPosition, replace, remove} from '../utils/render.js';
@@ -45,15 +45,11 @@ class Point {
     if(isOnline()) {
       this._pointEditComponent = new PointEditView(point, offers, destinations);
       this._pointEditComponent.setFormSubmitHandler(this._handleFormSubmit);
-      //this._pointEditComponent.setClickCloseHandler(this._handleClickClose);
       this._pointEditComponent.setDeleteClickHandler(this._handleDeleteClick);
     }
 
     this._pointComponent.setEditClickHandler(this._handleEditClick);
     this._pointComponent.setFavoriteClickHandler(this._handleFavoriteClick);
-    //this._pointEditComponent.setFormSubmitHandler(this._handleFormSubmit);
-    //this._pointEditComponent.setFormResetHandler(this._handleFormReset);
-    //this._pointEditComponent.setDeleteClickHandler(this._handleDeleteClick);
 
     if (prevPointComponent === null || prevPointEditComponent === null) {
       render(this._pointListContainer, this._pointComponent, RenderPosition.BEFOREEND);
@@ -143,10 +139,7 @@ class Point {
   }
 
   _handleFormSubmit(update) {
-    // Проверяем, поменялись ли в точке данные, которые попадают под фильтрацию,
-    // а значит требуют перерисовки списка - если таких нет, это PATCH-обновление
     const isMinorUpdate = !isDatesEqual(this._point, update);
-    //console.log(this._point);
 
     this._changeData(
       UserAction.UPDATE_POINT,

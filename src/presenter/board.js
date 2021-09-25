@@ -1,5 +1,6 @@
-import PointListView from '../view/site-points-list.js';
-import SortView from '../view/site-sorting.js';
+import TripInfoView from '../view/trip-info.js';
+import PointListView from '../view/points-list.js';
+import SortView from '../view/sorting.js';
 import LoadingView from '../view/loading.js';
 import NoPointView from '../view/no-point.js';
 import PointPresenter, {State as PointPresenterViewState}  from './point.js';
@@ -10,18 +11,20 @@ import {filter} from '../utils/filter.js';
 import {SortType, UpdateType, UserAction, FilterType} from '../const.js';
 
 class Board {
-  constructor(boardContainer, pointsModel, filterModel, offersModel, api, destinationsModel) {
+  constructor(infoContainer, boardContainer, pointsModel, filterModel, offersModel, api, destinationsModel) {
     this._api = api;
     this._pointsModel = pointsModel;
     this._filterModel = filterModel;
     this._offersModel = offersModel;
     this._destinationsModel = destinationsModel;
     this._boardContainer = boardContainer;
+    this._infoContainer = infoContainer;
     this._pointPresenter = new Map();
-    this._filterType = FilterType.ALL;
+    this._filterType = FilterType.EVERYTHING;
     this._currentSortType = SortType.DEFAULT;
     this._isLoading = true;
 
+    this._infoComponent = null;
     this._sortComponent = null;
     this._noPointComponent = null;
 
@@ -48,6 +51,7 @@ class Board {
   destroy() {
     this._clearBoard({resetSortType: true});
 
+    remove(this._infoComponent);
     remove(this._pointListComponent);
 
     this._pointsModel.removeObserver(this._handleModelEvent);
@@ -150,6 +154,16 @@ class Board {
     this._renderBoard();
   }
 
+  renderInfo() {
+    if(this._infoComponent !== null) {
+      this._infoComponent = null;
+    }
+
+    this._infoComponent = new TripInfoView(this._pointsModel.getPoints());
+
+    render(this._infoContainer, this._infoComponent, RenderPosition.AFTERBEGIN);
+  }
+
   _renderSort() {
     if (this._sortComponent !== null) {
       this._sortComponent = null;
@@ -192,6 +206,7 @@ class Board {
 
     remove(this._sortComponent);
     remove(this._loadingComponent);
+    remove(this._infoComponent);
 
     if (this._noPointComponent) {
       remove(this._noPointComponent);
@@ -210,6 +225,10 @@ class Board {
 
     const points = this._getPoints();
     const pointCount = points.length;
+
+    if(pointCount !== 0) {
+      this.renderInfo();
+    }
 
     if (pointCount === 0) {
       this._renderNoPoints();

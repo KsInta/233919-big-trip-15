@@ -1,6 +1,5 @@
-import PointEditView from '../view/site-add-new-point.js';
+import PointEditView from '../view/point-edit.js';
 import {BLANK_POINT} from '../const.js';
-//import {nanoid} from 'nanoid';
 import {remove, render, RenderPosition} from '../utils/render.js';
 import {UserAction, UpdateType} from '../const.js';
 

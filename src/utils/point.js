@@ -36,4 +36,4 @@ const getDurationFormated = (dateStart, dateEnd) => {
   return `${diffDays} ${diffHours} ${diffMinutes}`;
 };
 
-export {isExpired, humanizePointDueDate, sortPointTimeUp, sortPointDuration, sortPointPrice, isDatesEqual, getDurationFormated};
+export {isExpired, humanizePointDueDate, sortPointTimeUp, sortPointDuration, sortPointPrice, isDatesEqual, getDurationFormated, getDiffDuration};

@@ -1,5 +1,4 @@
 import {FilterType} from '../const.js';
-//import {isExpired} from './point.js';
 
 const filter = {
   [FilterType.EVERYTHING]: (points) => points,

@@ -33,7 +33,7 @@ const createEditPointOffersTemplate = (type, offersSelected, offers, id, isDisab
 
       <div class="event__available-offers">
         ${offersByType.map(({title, price}) => `<div class="event__offer-selector">
-            <input class="event__offer-checkbox  visually-hidden" id="event-offer-${title}-${id}" type="checkbox" name="event-offer-${title}-${price}" ${isCheckedOffer(title)} ${isDisabled ? 'disabled' : ''}>
+            <input class="event__offer-checkbox  visually-hidden" id="event-offer-${title}-${id}" type="checkbox" name="event-offer-${title}-${price}" ${isCheckedOffer(title)} ${isDisabled ? 'disabled' : ''} data-title="${title}" data-cost="${price}">
             <label class="event__offer-label" for="event-offer-${title}-${id}" ${isDisabled ? LABEL_DISABLED_STYLE : ''} >
               <span class="event__offer-title">${title}</span>
               &plus;&euro;&nbsp;
@@ -153,7 +153,6 @@ class PointEdit extends SmartView {
 
     this._formSubmitHandler = this._formSubmitHandler.bind(this);
     this._formDeleteClickHandler = this._formDeleteClickHandler.bind(this);
-    //this._formResetHandler = this._formResetHandler.bind(this);
     this._dueDateChangeHandler = this._dueDateChangeHandler.bind(this);
     this._endDateChangeHandler = this._endDateChangeHandler.bind(this);
     this._offersTypeSelectHandler = this._offersTypeSelectHandler.bind(this);
@@ -190,7 +189,6 @@ class PointEdit extends SmartView {
     this._setInnerHandlers();
     this._setDatepicker();
     this.setFormSubmitHandler(this._callback.formSubmit);
-    //this.setFormResetHandler(this._callback.formReset);
     this.setDeleteClickHandler(this._callback.deleteClick);
   }
 
@@ -218,6 +216,7 @@ class PointEdit extends SmartView {
       {
         enableTime: true,
         dateFormat: 'd/m/Y H:i',
+        minDate: this._data.dateFrom,
         ['time_24hr']: true,
         defaultDate: this._data.dateTo,
         onChange: this._endDateChangeHandler,
@@ -246,6 +245,8 @@ class PointEdit extends SmartView {
     this.updateData({
       dateFrom: userDate.toISOString(),
     });
+
+    this._datepickerEnd.set('defaultDate', this._data.dateFrom);
   }
 
   _endDateChangeHandler([userDate]) {
@@ -260,8 +261,6 @@ class PointEdit extends SmartView {
     }
 
     const type = evt.target.getAttribute('type');
-    //const pointOffers = EVENT_OFFERS.find((offer) => offer.type === type);
-    //const isOffersExist = pointOffers.offers !== null;
 
     this.getElement()
       .querySelector('.event__type-icon').setAttribute('src', `img/icons/${type}.png`);
@@ -279,8 +278,8 @@ class PointEdit extends SmartView {
     checkboxElements.forEach((checkbox) => {
       if(checkbox.checked) {
         currentOffers.push({
-          title: checkbox.name.split('-')[2],
-          price: + checkbox.name.split('-')[3],
+          title: checkbox.getAttribute('data-title'),
+          price: + checkbox.getAttribute('data-cost'),
         });
       }
     });
@@ -334,16 +333,6 @@ class PointEdit extends SmartView {
     this._callback.deleteClick = callback;
     this.getElement().querySelector('.event__reset-btn').addEventListener('click', this._formDeleteClickHandler);
   }
-
-  /*_formResetHandler(evt) {
-    evt.preventDefault();
-    this._callback.formReset();
-  }
-
-  setFormResetHandler(callback) {
-    this._callback.formReset = callback;
-    this.getElement().querySelector('form').addEventListener('reset', this._formResetHandler);
-  }*/
 
   static parsePointToData(point) {
     return Object.assign({}, point, {isDisabled: false, isSaving: false, isDeleting: false});

@@ -254,6 +254,7 @@ main {
           user-select: none;
   color: inherit;
   opacity: 0.8;
+  cursor: pointer;
   -webkit-transition: opacity 0.2s;
   transition: opacity 0.2s; }
   .trip-tabs__btn:not(:last-of-type) {
@@ -264,7 +265,8 @@ main {
     opacity: 0.6; }
   .trip-tabs__btn--active, .trip-tabs__btn--active:hover, .trip-tabs__btn--active:active {
     opacity: 1;
-    cursor: default; }
+    cursor: default;
+    pointer-events: none; }
 
 .trip-filters {
   display: -ms-flexbox;
