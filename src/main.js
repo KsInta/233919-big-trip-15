@@ -1,4 +1,4 @@
-import SiteMenuView  from './view/menu.js';
+import MenuView  from './view/menu.js';
 import StatisticsView from './view/statistics.js';
 import BoardPresenter from './presenter/board.js';
 import FilterPresenter from './presenter/filter.js';
@@ -12,7 +12,7 @@ import Api from './api/api.js';
 import Store from './api/store.js';
 import Provider from './api/provider.js';
 
-const AUTHORIZATION = 'Basic zh9a590vi02033a';
+const AUTHORIZATION = 'Basic zh9a590vi02088a';
 const END_POINT = 'https://15.ecmascript.pages.academy/big-trip';
 const STORE_PREFIX = 'big-trip-localstorage';
 const STORE_VER = 'v15';
@@ -32,7 +32,7 @@ const filterModel = new FilterModel();
 const offersModel = new OffersModel();
 const destinationsModel =  new DestinationsModel();
 
-const siteMenuComponent = new SiteMenuView();
+const siteMenuComponent = new MenuView();
 
 const siteMainElement = document.querySelector('.page-body');
 const siteHeaderElement = siteMainElement.querySelector('.page-header');
