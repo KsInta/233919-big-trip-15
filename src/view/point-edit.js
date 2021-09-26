@@ -116,7 +116,7 @@ const createPointEditTemplate = (data, offers, destinations, isNewEvent) => {
             <span class="visually-hidden">Price</span>
             &euro;
           </label>
-          <input class="event__input  event__input--price" id="event-price-${id}" type="number" name="event-price" value="${basePrice}" ${isDisabled ? 'disabled' : ''}>
+          <input class="event__input  event__input--price" id="event-price-${id}" type="text" name="event-price" value="${basePrice}" ${isDisabled ? 'disabled' : ''}>
         </div>
 
         <button class="event__save-btn  btn  btn--blue" type="submit" ${isDisabled ? 'disabled' : ''}>${isSaving ? 'Saving...' : 'Save'}</button>
@@ -238,7 +238,7 @@ class PointEdit extends SmartView {
       .addEventListener('change', this._cityChangeHandler);
     this.getElement()
       .querySelector('.event__input--price')
-      .addEventListener('change', this._priceChangeHandler);
+      .addEventListener('input', this._priceChangeHandler);
   }
 
   _dueDateChangeHandler([userDate]) {
@@ -301,9 +301,16 @@ class PointEdit extends SmartView {
   }
 
   _priceChangeHandler(evt) {
-    this.updateData({
-      basePrice: +evt.target.value,
-    });
+    evt.preventDefault();
+    evt.target.required = true;
+    evt.target.autocomplete = 'off';
+    if(isNaN(evt.target.value) || + evt.target.value <= 0 || !Number.isInteger(+ evt.target.value)) {
+      evt.target.setCustomValidity('There should be onlya positive number');
+    } else {
+      evt.target.setCustomValidity('');
+      this.updateData({basePrice: + evt.target.value}, 'noUpdateElement');
+    }
+    evt.target.reportValidity();
   }
 
   _formSubmitHandler(evt) {

@@ -6,7 +6,7 @@ class Smart extends Abstract {
     this._data = {};
   }
 
-  updateData(update) {
+  updateData(update, optionNoUpdateElement) {
     if (!update) {
       return;
     }
@@ -16,6 +16,10 @@ class Smart extends Abstract {
       this._data,
       update,
     );
+
+    if(optionNoUpdateElement === 'noUpdateElement') {
+      return;
+    }
 
     this.updateElement();
   }

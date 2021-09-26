@@ -12,7 +12,7 @@ import Api from './api/api.js';
 import Store from './api/store.js';
 import Provider from './api/provider.js';
 
-const AUTHORIZATION = 'Basic zh9a590ri02048a';
+const AUTHORIZATION = 'Basic zh9f590ri32043a';
 const END_POINT = 'https://15.ecmascript.pages.academy/big-trip';
 const STORE_PREFIX = 'big-trip-localstorage';
 const STORE_VER = 'v15';

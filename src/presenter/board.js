@@ -1,6 +1,6 @@
 import TripInfoView from '../view/trip-info.js';
-import PointListView from '../view/points-list.js';
-import SortView from '../view/sorting.js';
+import PointListView from '../view/point-list.js';
+import SortView from '../view/sort.js';
 import LoadingView from '../view/loading.js';
 import NoPointView from '../view/no-point.js';
 import PointPresenter, {State as PointPresenterViewState}  from './point.js';
