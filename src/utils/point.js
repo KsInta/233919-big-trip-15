@@ -1,6 +1,7 @@
 import dayjs from 'dayjs';
 
-const isExpired = (dueDate) => dayjs().isAfter(dueDate, 'D');
+const dateDifferenceInDay = (dateEnd, dateStart) => dayjs(dateEnd).diff(dateStart);
+
 const humanizePointDueDate = (dueDate, format) => dayjs(dueDate).format(format);
 
 const sortPointTimeUp = (pointA, pointB) => new Date(pointA.dateFrom) - new Date(pointB.dateFrom);
@@ -36,4 +37,4 @@ const getDurationFormated = (dateStart, dateEnd) => {
   return `${diffDays} ${diffHours} ${diffMinutes}`;
 };
 
-export {isExpired, humanizePointDueDate, sortPointTimeUp, sortPointDuration, sortPointPrice, isDatesEqual, getDurationFormated, getDiffDuration};
+export {dateDifferenceInDay, humanizePointDueDate, sortPointTimeUp, sortPointDuration, sortPointPrice, isDatesEqual, getDurationFormated, getDiffDuration};

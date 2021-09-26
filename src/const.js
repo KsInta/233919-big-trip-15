@@ -43,10 +43,11 @@ const BLANK_POINT = {
   dateTo: new Date().toISOString(),
   destination: {
     description: '',
-    name: 'Tokio',
+    name: '',
     pictures: [],
   },
   offersSelected: [],
+  isFavorite: false,
 };
 
 export {Endpoints, SortType, UserAction, UpdateType, FilterType, MenuItem, BLANK_POINT};

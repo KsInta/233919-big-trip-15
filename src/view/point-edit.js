@@ -295,15 +295,7 @@ class PointEdit extends SmartView {
       evt.target.setCustomValidity('There must be values from the list');
     } else {
       evt.target.setCustomValidity('');
-      this.updateData({
-        destination: Object.assign(
-          {},
-          this._data.destination,
-          {
-            name: evt.target.value,
-          },
-        ),
-      });
+      this.updateData({destination: isExists[0]});
     }
     evt.target.reportValidity();
   }
